@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/psu.jpg">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+     <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+     <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+    <title>
+        
+          线程池源码剖析 - 夏飞 | Blog
+        
+    </title>
+
+    <link rel="canonical" href="https://www.xia-fei.com/article/ThreadPoolExecuter/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+
+    <link rel="stylesheet" href="/css/donate.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('https://xiafei-web.oss-cn-hangzhou.aliyuncs.com/file-server/1550217547280.png')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#Thread" title="Thread">Thread</a>
+                            
+                        </div>
+                        <h1>线程池源码剖析</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by 夏飞 on
+                            2018-06-04
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">夏飞</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h3 id="threadpoolexecutor-白话概念">ThreadPoolExecutor 白话概念</h3>
+<p><strong>线程池里面有一个集合里面放的<code>Worker</code>对象 集合大小对应着核心线程数</strong></p>
+<ol>
+<li>如果工作线程数量小于核心线程数</li>
+<li>会创建任务放进集合,之后启动<code>Worker</code>线程</li>
+<li>工作线程数不小于核心线程数,往队列里面放任务</li>
+<li><code>Worker</code>线程启动之后,<code>worker</code>线程会调<code>runWorker()</code>方法</li>
+<li>它会一直循环从队列里面取任务。然后调用它的<code>Run</code>方法取执行它。</li>
+</ol>
+<a id="more"></a>
+<h4 id="线程池threadpoolexecutor分析">线程池ThreadPoolExecutor分析</h4>
+<h5 id="一-首先看threadpoolexecutorexecuterunnable提交任务方法">一、首先看<code>ThreadPoolExecutor#execute(Runnable)</code>提交任务方法</h5>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> c = ctl.get();</span><br><span class="line">       <span class="keyword">if</span> (workerCountOf(c) &lt; corePoolSize) &#123;</span><br><span class="line">           <span class="keyword">if</span> (addWorker(command, <span class="keyword">true</span>))</span><br><span class="line">               <span class="keyword">return</span>;</span><br><span class="line">           c = ctl.get();</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">if</span> (isRunning(c) &amp;&amp; workQueue.offer(command)) &#123;</span><br><span class="line">           <span class="keyword">int</span> recheck = ctl.get();</span><br><span class="line">           <span class="keyword">if</span> (! isRunning(recheck) &amp;&amp; remove(command))</span><br><span class="line">               reject(command);</span><br><span class="line">           <span class="keyword">else</span> <span class="keyword">if</span> (workerCountOf(recheck) == <span class="number">0</span>)</span><br><span class="line">               addWorker(<span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">else</span> <span class="keyword">if</span> (!addWorker(command, <span class="keyword">false</span>))</span><br><span class="line">           reject(command);</span><br></pre></td></tr></table></figure>
+<ol>
+<li>判断超过核心线程数没 没超过addWorker (Worker对象也很关键)</li>
+<li>创建任务或者workQuery.offer()队列里存放任务</li>
+<li>判断超出限制拒绝任务</li>
+</ol>
+<h5 id="二-threadpoolexecutoraddworkerrunnable-firsttask-boolean-core添加工作线程方法">二、<code>ThreadPoolExecutor#addWorker(Runnable firstTask, boolean core)</code>添加工作线程方法</h5>
+<p>第1段 判断</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">retry:</span><br><span class="line">        <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">            <span class="keyword">int</span> c = ctl.get();</span><br><span class="line">            <span class="keyword">int</span> rs = runStateOf(c);</span><br><span class="line">            <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">                <span class="keyword">int</span> wc = workerCountOf(c);</span><br><span class="line">                <span class="keyword">if</span> (wc &gt;= CAPACITY ||</span><br><span class="line">                    wc &gt;= (core ? corePoolSize : maximumPoolSize))</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">                <span class="keyword">if</span> (compareAndIncrementWorkerCount(c))</span><br><span class="line">                    <span class="keyword">break</span> retry;</span><br><span class="line">                c = ctl.get();  <span class="comment">// Re-read ctl</span></span><br><span class="line">                <span class="keyword">if</span> (runStateOf(c) != rs)</span><br><span class="line">                    <span class="keyword">continue</span> retry;      </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码主要是为了判断当前线程池状态和限制数量，不正确进行重试，略过compareAndIncrementWorkerCount成功跳出最外层循环往下走。<br>
+第2段 才是这个方法的核心部分</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">boolean</span> workerStarted = <span class="keyword">false</span>;</span><br><span class="line"><span class="keyword">boolean</span> workerAdded = <span class="keyword">false</span>;</span><br><span class="line">Worker w = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">final</span> ReentrantLock mainLock = <span class="keyword">this</span>.mainLock;</span><br><span class="line">    w = <span class="keyword">new</span> Worker(firstTask);</span><br><span class="line">    <span class="keyword">final</span> Thread t = w.thread;</span><br><span class="line">    <span class="keyword">if</span> (t != <span class="keyword">null</span>) &#123;</span><br><span class="line">        mainLock.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">                workers.add(w);</span><br><span class="line">                <span class="keyword">int</span> s = workers.size();</span><br><span class="line">                <span class="keyword">if</span> (s &gt; largestPoolSize)</span><br><span class="line">                    largestPoolSize = s;</span><br><span class="line">                workerAdded = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            mainLock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (workerAdded) &#123;</span><br><span class="line">            t.start();      </span><br><span class="line">        &#125;</span><br><span class="line"><span class="keyword">return</span> workerStarted;</span><br></pre></td></tr></table></figure>
+<p>ThreadPoolExecutor里面有一个Set<worker> 集合。将要提交的任务Runnable放到Worker对象里 ，Worker对象本身是一个线程，然后启动它</worker></p>
+<h5 id="三-worker对象本身也是一个对象">三、<code>Worker对象，本身也是一个对象</code></h5>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Worker</span> <span class="keyword">extends</span> <span class="title">AbstractQueuedSynchronizer</span> <span class="keyword">implements</span> <span class="title">Runnable</span></span></span><br><span class="line"><span class="class">        <span class="title">final</span> <span class="title">Thread</span> <span class="title">thread</span></span>;</span><br><span class="line">        Runnable firstTask;</span><br><span class="line">        <span class="keyword">volatile</span> <span class="keyword">long</span> completedTasks;</span><br><span class="line">        Worker(Runnable firstTask) &#123;</span><br><span class="line">            setState(-<span class="number">1</span>); <span class="comment">// inhibit interrupts until runWorker</span></span><br><span class="line">            <span class="keyword">this</span>.firstTask = firstTask;</span><br><span class="line">            <span class="keyword">this</span>.thread = getThreadFactory().newThread(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            runWorker(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title">runWorker</span><span class="params">(Worker w)</span> </span>&#123;</span><br><span class="line">            Thread wt = Thread.currentThread();</span><br><span class="line">            Runnable task = w.firstTask;</span><br><span class="line">            w.firstTask = <span class="keyword">null</span>;</span><br><span class="line">            w.unlock(); <span class="comment">// allow interrupts</span></span><br><span class="line">            <span class="keyword">boolean</span> completedAbruptly = <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">while</span> (task != <span class="keyword">null</span> || (task = getTask()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">                w.lock();</span><br><span class="line">                    beforeExecute(wt, task);</span><br><span class="line">                        task.run();</span><br><span class="line">                    w.completedTasks++;</span><br><span class="line">                    w.unlock();</span><br><span class="line">            &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码运行一个线程 死循环 <code>getTask()</code>取<code>Runnable</code>调用他的<code>Run()</code>方法 其中<code>getTask()</code>是关键;</p>
+<h5 id="四-threadpoolexecutorgettask-从队列取任务方法">四、ThreadPoolExecutor#getTask() 从队列取任务方法</h5>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">boolean</span> timedOut = <span class="keyword">false</span>; <span class="comment">// Did the last poll() time out?</span></span><br><span class="line">       retry:</span><br><span class="line">       <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">           <span class="keyword">int</span> c = ctl.get();</span><br><span class="line">           <span class="keyword">int</span> rs = runStateOf(c);  </span><br><span class="line">               Runnable r = timed ?</span><br><span class="line">                   workQueue.poll(keepAliveTime, TimeUnit.NANOSECONDS) :</span><br><span class="line">                   workQueue.take();</span><br><span class="line">               <span class="keyword">if</span> (r != <span class="keyword">null</span>)</span><br><span class="line">             <span class="keyword">return</span> r;          </span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
+<p>死循环从workQueue取Runnable任务返回</p>
+<h4 id="threadpoolexecutor-ctl字段分析">ThreadPoolExecutor ctl字段分析</h4>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> COUNT_BITS = Integer.SIZE - <span class="number">3</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> CAPACITY   = (<span class="number">1</span> &lt;&lt; COUNT_BITS) - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// runState is stored in the high-order bits</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> RUNNING    = -<span class="number">1</span> &lt;&lt; COUNT_BITS;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> SHUTDOWN   =  <span class="number">0</span> &lt;&lt; COUNT_BITS;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> STOP       =  <span class="number">1</span> &lt;&lt; COUNT_BITS;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TIDYING    =  <span class="number">2</span> &lt;&lt; COUNT_BITS;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TERMINATED =  <span class="number">3</span> &lt;&lt; COUNT_BITS;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">runStateOf</span><span class="params">(<span class="keyword">int</span> c)</span>     </span>&#123; <span class="keyword">return</span> c &amp; ~CAPACITY; &#125;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">workerCountOf</span><span class="params">(<span class="keyword">int</span> c)</span>  </span>&#123; <span class="keyword">return</span> c &amp; CAPACITY; &#125;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">ctlOf</span><span class="params">(<span class="keyword">int</span> rs, <span class="keyword">int</span> wc)</span> </span>&#123; <span class="keyword">return</span> rs | wc; &#125;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>线程状态</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>十进制数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>RUNNING</strong></td>
+<td>1110</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>-536870912</td>
+</tr>
+<tr>
+<td><strong>SHUTDOWN</strong></td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0</td>
+</tr>
+<tr>
+<td><strong>STOP</strong></td>
+<td>0010</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>536870912</td>
+</tr>
+<tr>
+<td><strong>TIDYING</strong></td>
+<td>0100</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>1073741824</td>
+</tr>
+<tr>
+<td><strong>TERMINATED</strong></td>
+<td>0110</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>1610612736</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>----</th>
+<th>十进制数值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CAPACITY</strong></td>
+<td>0001</td>
+<td>1111</td>
+<td>1111</td>
+<td>1111</td>
+<td>1111</td>
+<td>1111</td>
+<td>1111</td>
+<td>1111</td>
+<td>536870911</td>
+</tr>
+<tr>
+<td><strong>~CAPACITY</strong></td>
+<td>1110</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>0000</td>
+<td>-536870912</td>
+</tr>
+</tbody>
+</table>
+<p>由此二进制结果 分析</p>
+<blockquote>
+<p>runStateOf() c &amp; ~CAPACITY</p>
+</blockquote>
+<p>相当于就是取前4位的值</p>
+<blockquote>
+<p>workerCountOf() c &amp; CAPACITY</p>
+</blockquote>
+<p>相当就是取后面的值</p>
+<p>ctl一个int型4个字节 4*8=32 位 里面存了两部分的值<br>
+前面4位存的是线程的5个状态,后面28位存的工作线程池的数量</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> c = ctl.get();</span><br><span class="line"><span class="keyword">int</span> rs = runStateOf(c);</span><br><span class="line"><span class="keyword">if</span> (rs &gt;= SHUTDOWN &amp;&amp;! (rs == SHUTDOWN &amp;&amp;firstTask == <span class="keyword">null</span> &amp;&amp;! workQueue.isEmpty()));</span><br></pre></td></tr></table></figure>
+<p>这种<code>rs &gt;= SHUTDOWN</code> 相当<em>SHUTDOWN</em>,<em>STOP</em>,<em>TIDYING</em>,<em>TERMINATED</em>这些字段是符合状态的。</p>
+<br>
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/article/SpringMVCOutputStream/" data-toggle="tooltip" data-placement="top" title="SpringMVC优雅的返回文件流">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                <!--分享-->
+
+                  <!--valine评论-->
+
+
+                                         <div id="vcomments"></div>
+                                            <script>
+                                                new Valine({
+                                                    el: '#vcomments',
+                                                    appId: 'E0ryUYtTAj4TVeeCwvJIJXyE-gzGzoHsz',
+                                                    appKey: 'QFqJhS107cFS5lCgA2oc88F4'
+                                                })
+                                            </script>
+
+                   <!--valine评论-->
+                <br>                       
+                
+                <!-- require APlayer -->
+                
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#Thread" title="Thread">Thread</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://sql.xia-fei.com" target="_blank">sql转化JavaBean</a></li>
+                    
+                        <li><a href="https://image.xia-fei.com" target="_blank">免费图床</a></li>
+                    
+                        <li><a href="https://note.xia-fei.com" target="_blank">云记事本</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/xia-fei">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 夏飞 2019
+                    <br>
+
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="https://www.xia-fei.com">夏飞</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=xia-fei&repo=xia-fei.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://www.xia-fei.com/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '13f02310ca9dd9767d91fc9871e30f21';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

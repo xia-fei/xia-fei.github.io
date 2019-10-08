@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/psu.jpg">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+     <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+     <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+    <title>
+        
+          java包扫描功能实现分析 - 夏飞 | Blog
+        
+    </title>
+
+    <link rel="canonical" href="https://www.xia-fei.com/article/packageScan/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+
+    <link rel="stylesheet" href="/css/donate.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('https://xiafei-web.oss-cn-hangzhou.aliyuncs.com/file-server/1550217547280.png')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#java" title="java">java</a>
+                            
+                        </div>
+                        <h1>java包扫描功能实现分析</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by 夏飞 on
+                            2018-12-25
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">夏飞</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h3 id="问题分析">问题分析</h3>
+<p>输入包名 eg:com.xiafei<br>
+返回包下面所有的类名</p>
+<p>先总结再看过程</p>
+<h3 id="总结">总结</h3>
+<h5 id="1包名换成路径名">1.包名换成路径名</h5>
+<p>com/xiafei/</p>
+<h5 id="2获取系统中绝对路径">2.获取系统中绝对路径</h5>
+<p>Class.getResource(“com/xiafei/”)</p>
+<h5 id="3获取文件夹下面所有class文件名">3.获取文件夹下面所有class文件名</h5>
+<p>File.listFiles()</p>
+<a id="more"></a>
+<h5 id="4获取文件名称">4.获取文件名称</h5>
+<h5 id="spring源码过程">Spring源码过程</h5>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        PathMatchingResourcePatternResolver pathMatchingResourcePatternResolver=<span class="keyword">new</span> PathMatchingResourcePatternResolver();</span><br><span class="line">        Resource[]  resources=pathMatchingResourcePatternResolver.getResources(<span class="string">"classpath*:com/wing/core/mock/generate/handler/*.class"</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; resources.length; i++) &#123;</span><br><span class="line">            Resource resource = resources[i];</span><br><span class="line">            System.out.println(resource.getURI());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> Resource[] findPathMatchingResources(String locationPattern) <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="comment">//文件夹路径</span></span><br><span class="line">        String rootDirPath = determineRootDir(locationPattern);</span><br><span class="line">        <span class="comment">//匹配文件路径</span></span><br><span class="line">        String subPattern = locationPattern.substring(rootDirPath.length());</span><br><span class="line">        Resource[] rootDirResources = findAllClassPathResources(rootDirPath);</span><br><span class="line">        Set&lt;Resource&gt; result = <span class="keyword">new</span> LinkedHashSet&lt;Resource&gt;(<span class="number">16</span>);</span><br><span class="line">        <span class="keyword">for</span> (Resource rootDirResource : rootDirResources) &#123;</span><br><span class="line">                result.addAll(doFindPathMatchingFileResources(rootDirResource, subPattern));</span><br><span class="line">        <span class="keyword">return</span> result.toArray(<span class="keyword">new</span> Resource[result.size()]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//根据文件夹名字找到Resouce也就是文件的绝对位置</span></span><br><span class="line">    <span class="keyword">protected</span> Resource[] findAllClassPathResources(String location) <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        String path = location;</span><br><span class="line">        <span class="keyword">if</span> (path.startsWith(<span class="string">"/"</span>)) &#123;</span><br><span class="line">            path = path.substring(<span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        Set&lt;Resource&gt; result = doFindAllClassPathResources(path);</span><br><span class="line">        <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">            logger.debug(<span class="string">"Resolved classpath location ["</span> + location + <span class="string">"] to resources "</span> + result);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> result.toArray(<span class="keyword">new</span> Resource[result.size()]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//根据文件夹名字找到Resouce也就是文件的绝对位置</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Set&lt;Resource&gt; <span class="title">doFindAllClassPathResources</span><span class="params">(String path)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        Set&lt;Resource&gt; result = <span class="keyword">new</span> LinkedHashSet&lt;Resource&gt;(<span class="number">16</span>);</span><br><span class="line">        ClassLoader cl = getClassLoader();</span><br><span class="line">        Enumeration&lt;URL&gt; resourceUrls = (cl != <span class="keyword">null</span> ? cl.getResources(path) : ClassLoader.getSystemResources(path));</span><br><span class="line">        <span class="keyword">while</span> (resourceUrls.hasMoreElements()) &#123;</span><br><span class="line">            URL url = resourceUrls.nextElement();</span><br><span class="line">            result.add(convertClassLoaderURL(url));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//扫描具体文件</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> Set&lt;Resource&gt; <span class="title">doFindPathMatchingFileResources</span><span class="params">(Resource rootDirResource, String subPattern)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">        File rootDir;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            rootDir = rootDirResource.getFile().getAbsoluteFile();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">            <span class="keyword">if</span> (logger.isWarnEnabled()) &#123;</span><br><span class="line">                logger.warn(<span class="string">"Cannot search for matching files underneath "</span> + rootDirResource +</span><br><span class="line">                        <span class="string">" because it does not correspond to a directory in the file system"</span>, ex);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> Collections.emptySet();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> doFindMatchingFileSystemResources(rootDir, subPattern);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//扫描</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Set&lt;Resource&gt; <span class="title">doFindMatchingFileSystemResources</span><span class="params">(File rootDir, String subPattern)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">            logger.debug(<span class="string">"Looking for matching resources in directory tree ["</span> + rootDir.getPath() + <span class="string">"]"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        Set&lt;File&gt; matchingFiles = retrieveMatchingFiles(rootDir, subPattern);</span><br><span class="line">        Set&lt;Resource&gt; result = <span class="keyword">new</span> LinkedHashSet&lt;Resource&gt;(matchingFiles.size());</span><br><span class="line">        <span class="keyword">for</span> (File file : matchingFiles) &#123;</span><br><span class="line">            result.add(<span class="keyword">new</span> FileSystemResource(file));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Set&lt;File&gt; <span class="title">retrieveMatchingFiles</span><span class="params">(File rootDir, String pattern)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        fullPattern = fullPattern + StringUtils.replace(pattern, File.separator, <span class="string">"/"</span>);</span><br><span class="line">        Set&lt;File&gt; result = <span class="keyword">new</span> LinkedHashSet&lt;File&gt;(<span class="number">8</span>);</span><br><span class="line">        <span class="comment">//真正扫描</span></span><br><span class="line">        doRetrieveMatchingFiles(fullPattern, rootDir, result);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doRetrieveMatchingFiles</span><span class="params">(String fullPattern, File dir, Set&lt;File&gt; result)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//获取下面所有子文件</span></span><br><span class="line">        File[] dirContents = dir.listFiles();</span><br><span class="line">      </span><br><span class="line">        Arrays.sort(dirContents);</span><br><span class="line">        <span class="comment">//一个模糊匹配功能</span></span><br><span class="line">        <span class="keyword">for</span> (File content : dirContents) &#123;</span><br><span class="line">            String currPath = StringUtils.replace(content.getAbsolutePath(), File.separator, <span class="string">"/"</span>);</span><br><span class="line">            <span class="keyword">if</span> (content.isDirectory() &amp;&amp; getPathMatcher().matchStart(fullPattern, currPath + <span class="string">"/"</span>)) &#123;</span><br><span class="line">                <span class="keyword">else</span> &#123;</span><br><span class="line">                    doRetrieveMatchingFiles(fullPattern, content, result);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (getPathMatcher().match(fullPattern, currPath)) &#123;</span><br><span class="line">                result.add(content);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h5 id="jar包扫描要复杂点">Jar包扫描要复杂点</h5>
+<p>关键点 URL目录转Resouce<br>
+org.springframework.core.io.support.PathMatchingResourcePatternResolver#doFindPathMatchingJarResources(org.springframework.core.io.Resource, java.net.URL, java.lang.String)</p>
+<p>URL-&gt;JarFile-&gt;jarFile.entries()-&gt;entry.getName()</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Set&lt;Resource&gt; <span class="title">doFindPathMatchingJarResources</span><span class="params">(Resource rootDirResource, URL rootDirURL, String subPattern)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Check deprecated variant for potential overriding first...</span></span><br><span class="line">        Set&lt;Resource&gt; result = doFindPathMatchingJarResources(rootDirResource, subPattern);</span><br><span class="line">        <span class="keyword">if</span> (result != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        URLConnection con = rootDirURL.openConnection();</span><br><span class="line">        JarFile jarFile;</span><br><span class="line">        String jarFileUrl;</span><br><span class="line">        String rootEntryPath;</span><br><span class="line">        <span class="keyword">boolean</span> closeJarFile;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (con <span class="keyword">instanceof</span> JarURLConnection) &#123;</span><br><span class="line">           </span><br><span class="line">            JarURLConnection jarCon = (JarURLConnection) con;</span><br><span class="line">            ResourceUtils.useCachesIfNecessary(jarCon);</span><br><span class="line">            jarFile = jarCon.getJarFile();</span><br><span class="line">            jarFileUrl = jarCon.getJarFileURL().toExternalForm();</span><br><span class="line">            JarEntry jarEntry = jarCon.getJarEntry();</span><br><span class="line">            rootEntryPath = (jarEntry != <span class="keyword">null</span> ? jarEntry.getName() : <span class="string">""</span>);</span><br><span class="line">            closeJarFile = !jarCon.getUseCaches();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">        </span><br><span class="line">            String urlFile = rootDirURL.getFile();</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">int</span> separatorIndex = urlFile.indexOf(ResourceUtils.WAR_URL_SEPARATOR);</span><br><span class="line">                <span class="keyword">if</span> (separatorIndex == -<span class="number">1</span>) &#123;</span><br><span class="line">                    separatorIndex = urlFile.indexOf(ResourceUtils.JAR_URL_SEPARATOR);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (separatorIndex != -<span class="number">1</span>) &#123;</span><br><span class="line">                    jarFileUrl = urlFile.substring(<span class="number">0</span>, separatorIndex);</span><br><span class="line">                    rootEntryPath = urlFile.substring(separatorIndex + <span class="number">2</span>);  <span class="comment">// both separators are 2 chars</span></span><br><span class="line">                    jarFile = getJarFile(jarFileUrl);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> &#123;</span><br><span class="line">                    jarFile = <span class="keyword">new</span> JarFile(urlFile);</span><br><span class="line">                    jarFileUrl = urlFile;</span><br><span class="line">                    rootEntryPath = <span class="string">""</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                closeJarFile = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span> (ZipException ex) &#123;</span><br><span class="line">                <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">                    logger.debug(<span class="string">"Skipping invalid jar classpath entry ["</span> + urlFile + <span class="string">"]"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> Collections.emptySet();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">      </span><br><span class="line">            <span class="keyword">if</span> (!<span class="string">""</span>.equals(rootEntryPath) &amp;&amp; !rootEntryPath.endsWith(<span class="string">"/"</span>)) &#123;</span><br><span class="line">                rootEntryPath = rootEntryPath + <span class="string">"/"</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            result = <span class="keyword">new</span> LinkedHashSet&lt;Resource&gt;(<span class="number">8</span>);</span><br><span class="line">            <span class="keyword">for</span> (Enumeration&lt;JarEntry&gt; entries = jarFile.entries(); entries.hasMoreElements();) &#123;</span><br><span class="line">                JarEntry entry = entries.nextElement();</span><br><span class="line">                String entryPath = entry.getName();</span><br><span class="line">                <span class="keyword">if</span> (entryPath.startsWith(rootEntryPath)) &#123;</span><br><span class="line">                    String relativePath = entryPath.substring(rootEntryPath.length());</span><br><span class="line">                    <span class="keyword">if</span> (getPathMatcher().match(subPattern, relativePath)) &#123;</span><br><span class="line">                        result.add(rootDirResource.createRelative(relativePath));</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (closeJarFile) &#123;</span><br><span class="line">                jarFile.close();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/article/ko-spring-mvc/" data-toggle="tooltip" data-placement="top" title="springMVC请求流程">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/article/Yum-package/" data-toggle="tooltip" data-placement="top" title="YUM包管理">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                <!--分享-->
+
+                  <!--valine评论-->
+
+
+                                         <div id="vcomments"></div>
+                                            <script>
+                                                new Valine({
+                                                    el: '#vcomments',
+                                                    appId: 'E0ryUYtTAj4TVeeCwvJIJXyE-gzGzoHsz',
+                                                    appKey: 'QFqJhS107cFS5lCgA2oc88F4'
+                                                })
+                                            </script>
+
+                   <!--valine评论-->
+                <br>                       
+                
+                <!-- require APlayer -->
+                
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#java" title="java">java</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://sql.xia-fei.com" target="_blank">sql转化JavaBean</a></li>
+                    
+                        <li><a href="https://image.xia-fei.com" target="_blank">免费图床</a></li>
+                    
+                        <li><a href="https://note.xia-fei.com" target="_blank">云记事本</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/xia-fei">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 夏飞 2019
+                    <br>
+
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="https://www.xia-fei.com">夏飞</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=xia-fei&repo=xia-fei.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://www.xia-fei.com/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '13f02310ca9dd9767d91fc9871e30f21';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>

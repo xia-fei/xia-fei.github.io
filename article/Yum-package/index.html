@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/psu.jpg">
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
+     <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+     <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+    <title>
+        
+          YUM包管理 - 夏飞 | Blog
+        
+    </title>
+
+    <link rel="canonical" href="https://www.xia-fei.com/article/Yum-package/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS --> 
+    <link rel="stylesheet" href="/css/beantech.min.css">
+
+    <link rel="stylesheet" href="/css/donate.css">
+    
+    <!-- Pygments Highlight CSS -->
+    <link rel="stylesheet" href="/css/highlight.css">
+
+    <link rel="stylesheet" href="/css/widget.css">
+
+    <link rel="stylesheet" href="/css/rocket.css">
+
+    <link rel="stylesheet" href="/css/signature.css">
+
+    <link rel="stylesheet" href="/css/toc.css">
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+	<!-- Modified by Yu-Hsuan Yen -->
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        
+            background-image: url('https://xiafei-web.oss-cn-hangzhou.aliyuncs.com/file-server/1550217547280.png')
+            /*post*/
+        
+    }
+    
+</style>
+
+<header class="intro-header" >
+    <!-- Signature -->
+    <div id="signature">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#Liunx" title="Liunx">Liunx</a>
+                            
+                        </div>
+                        <h1>YUM包管理</h1>
+                        <h2 class="subheading"></h2>
+                        <span class="meta">
+                            Posted by 夏飞 on
+                            2018-12-20
+                        </span>
+                    </div>
+                
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+	
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">夏飞</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+
+                    
+
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/archive/">Archives</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">Tags</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    <!-- Modify by Yu-Hsuan Yen -->
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <h3 id="rpm包">rpm包</h3>
+<p>rpm是由红帽公司开发的软件包管理方式，使用rpm我们可以方便的进行软件的安装、查询、卸载、升级等工作。但是rpm软件包之间的依赖性问题往往会很繁琐,尤其是软件由多个rpm包组成时。</p>
+<h2 id="rpm库的地址">rpm库的地址</h2>
+<p>配置在<br>
+<code>/etc/yum.repos.d/*</code><br>
+下面各个个文件中</p>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[nginx]</span><br><span class="line">name=nginx repo</span><br><span class="line">baseurl=https://nginx.org/packages/mainline/centos/7/$basearch/</span><br><span class="line">gpgcheck=0</span><br><span class="line">enabled=1</span><br></pre></td></tr></table></figure>
+<p>** /etc/yum.repos.d/ **修改完仓库之后要清除下缓存才能搜索的到<br>
+<code>yum makecache</code></p>
+<p>yum 的repo 配置文件中可用的变量：<br>
+$releasever:当前OS的发行版的主版本号$arch: 平台，i386,i486,i586,x86_64等<br>
+$basearch ：基础平台；i386, x86_64</p>
+<p>查看本机yum仓库<br>
+<code>yum repolist all</code><br>
+去掉<code>all</code> 就是查看已启用的文件服务器</p>
+<p><code>baseurl</code>就是存放**.rpm**文件的服务器<br>
+可以打开nginx rpm包服务器看下<br>
+<a href="https://nginx.org/packages/mainline/centos/7/" target="_blank" rel="noopener">https://nginx.org/packages/mainline/centos/7/</a></p>
+<p>yum search 其实就是去仓库地址扫描所有rpm文件</p>
+<h3 id="rpm">rpm</h3>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@izwz92672j5u4uc9wvpopgz rpm]# rpm -qi nginx</span><br><span class="line">Name        : nginx</span><br><span class="line">Epoch       : 1</span><br><span class="line">Version     : 1.15.5</span><br><span class="line">Release     : 1.el7_4.ngx</span><br><span class="line">Architecture: x86_64</span><br><span class="line">Install Date: Thu 25 Oct 2018 09:45:45 AM CST</span><br><span class="line">Group       : System Environment/Daemons</span><br><span class="line">Size        : 2786120</span><br><span class="line">License     : 2-clause BSD-like license</span><br><span class="line">Signature   : RSA/SHA1, Tue 02 Oct 2018 11:48:24 PM CST, Key ID abf5bd827bd9bf62</span><br><span class="line">Source RPM  : nginx-1.15.5-1.el7_4.ngx.src.rpm</span><br><span class="line">Build Date  : Tue 02 Oct 2018 11:27:21 PM CST</span><br><span class="line">Build Host  : centos74-amd64-builder-builder.gnt.nginx.com</span><br><span class="line">Relocations : (not relocatable)</span><br><span class="line">Vendor      : Nginx, Inc.</span><br><span class="line">URL         : http://nginx.org/</span><br><span class="line">Summary     : High performance web server</span><br><span class="line">Description :</span><br></pre></td></tr></table></figure>
+<p>** 其中第一行**<br>
+<strong>name就是软件名，给yum search 时匹配的名字</strong></p>
+<p>1.我的系统中安装了那些rpm软件包</p>
+<blockquote>
+<p>rpm -qa 列出所有安装过的包</p>
+</blockquote>
+<p>2、如何获得某个软件包的文件全名。</p>
+<blockquote>
+<p>rpm -q mysql</p>
+</blockquote>
+<p>3.查询rpm包详细信息</p>
+<blockquote>
+<p>rpm -qi nginx</p>
+</blockquote>
+<p>4、一个rpm包中的文件安装到那里去了？</p>
+<blockquote>
+<p>rpm -ql 包名</p>
+</blockquote>
+<p>5、查看包依赖</p>
+<blockquote>
+<p>rpm -qpR file.rpm　　　　　　　＃[查看包]依赖关系</p>
+</blockquote>
+<p>其它命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">rpm 执行安装包</span><br><span class="line">二进制包（Binary）以及源代码包（Source）两种。二进制包可以直接安装在计算机中，而源代码包将会由 RPM自动编译、安装。源代码包经常以src.rpm作为后缀名。</span><br><span class="line">常用命令组合：</span><br><span class="line">－ivh：安装显示安装进度--install--verbose--hash</span><br><span class="line">－Uvh：升级软件包--Update；</span><br><span class="line">－qpl： 列出RPM软件包内的文件信息[Query Package list]；</span><br><span class="line">－qpi：列出RPM软件包的描述信息[Query Package install package(s)]；</span><br><span class="line">－qf：查找指定文件属于哪个RPM软件包[Query File]；</span><br><span class="line">－Va：校验所有的 RPM软件包，查找丢失的文件[View Lost]；</span><br><span class="line">－e：删除包</span><br><span class="line">rpm -q samba //查询程序是否安装</span><br><span class="line">rpm -ivh /media/cdrom/RedHat/RPMS/samba-3.0.10-1.4E.i386.rpm //按路径安装并显示进度</span><br><span class="line">rpm -ivh --relocate /=/opt/gaim gaim-1.3.0-1.fc4.i386.rpm    //指定安装目录</span><br><span class="line">rpm -ivh --test gaim-1.3.0-1.fc4.i386.rpm　　　 //用来检查依赖关系；并不是真正的安装；</span><br><span class="line">rpm -Uvh --oldpackage gaim-1.3.0-1.fc4.i386.rpm //新版本降级为旧版本</span><br><span class="line">rpm -qa | grep httpd　　　　　 ＃[搜索指定rpm包是否安装]--all搜索*httpd*</span><br><span class="line">rpm -ql httpd　　　　　　　　　＃[搜索rpm包]--list所有文件安装目录</span><br><span class="line">rpm -qpi Linux-1.4-6.i368.rpm　＃[查看rpm包]--query--package--install package信息</span><br><span class="line">rpm -qpf Linux-1.4-6.i368.rpm　＃[查看rpm包]--file</span><br><span class="line">rpm -qpR file.rpm　　　　　　　＃[查看包]依赖关系</span><br><span class="line">rpm2cpio file.rpm |cpio -div    ＃[抽出文件]</span><br><span class="line">rpm -ivh file.rpm 　＃[安装新的rpm]--install--verbose--hash</span><br><span class="line">rpm -ivh [url]http://mirrors.kernel.org/fedora/core/4/i386/os/Fedora/RPMS/gaim-1.3.0-1.fc4.i386.rpm[/url] </span><br><span class="line">rpm -Uvh file.rpm    ＃[升级一个rpm]--upgrade</span><br><span class="line">rpm -e file.rpm      ＃[删除一个rpm包]--erase</span><br><span class="line">常用参数：</span><br><span class="line">Install/Upgrade/Erase options:</span><br><span class="line">-i, --install                     install package(s)</span><br><span class="line">-v, --verbose                     provide more detailed output</span><br><span class="line">-h, --hash                        print hash marks as package installs (good with -v)</span><br><span class="line">-e, --erase                       erase (uninstall) package</span><br><span class="line">-U, --upgrade=&lt;packagefile&gt;+      upgrade package(s)</span><br><span class="line">－-replacepkge                    无论软件包是否已被安装，都强行安装软件包</span><br><span class="line">--test                            安装测试，并不实际安装</span><br><span class="line">--nodeps                          忽略软件包的依赖关系强行安装</span><br><span class="line">--force                           忽略软件包及文件的冲突</span><br><span class="line">Query options (with -q or --query):</span><br><span class="line">-a, --all                         query/verify all packages</span><br><span class="line">-p, --package                     query/verify a package file</span><br><span class="line">-l, --list                        list files in package</span><br><span class="line">-d, --docfiles                    list all documentation files</span><br><span class="line">-f, --file                        query/verify package(s) owning file</span><br></pre></td></tr></table></figure>
+<p>总结：<br>
+一般安装软件其实需要rpm包就可以了<br>
+但是rpm依赖太多,依赖又需要个其它各仓库去下载。<br>
+YUM就是来解决这个问题<br>
+<code>yum search nginx</code><br>
+<code>yum install nginx</code></p>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/article/packageScan/" data-toggle="tooltip" data-placement="top" title="java包扫描功能实现分析">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                        <li class="next">
+                            <a href="/article/mongodb-deploy/" data-toggle="tooltip" data-placement="top" title="mongoDB部署笔记">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
+
+                <br>
+
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                <!--分享-->
+
+                  <!--valine评论-->
+
+
+                                         <div id="vcomments"></div>
+                                            <script>
+                                                new Valine({
+                                                    el: '#vcomments',
+                                                    appId: 'E0ryUYtTAj4TVeeCwvJIJXyE-gzGzoHsz',
+                                                    appKey: 'QFqJhS107cFS5lCgA2oc88F4'
+                                                })
+                                            </script>
+
+                   <!--valine评论-->
+                <br>                       
+                
+                <!-- require APlayer -->
+                
+
+                <!-- duoshuo Share start -->
+                
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#Liunx" title="Liunx">Liunx</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+
+                    
+                        <li><a href="https://sql.xia-fei.com" target="_blank">sql转化JavaBean</a></li>
+                    
+                        <li><a href="https://image.xia-fei.com" target="_blank">免费图床</a></li>
+                    
+                        <li><a href="https://note.xia-fei.com" target="_blank">云记事本</a></li>
+                    
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/xia-fei">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; 夏飞 2019
+                    <br>
+
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span> 
+                    re-Ported by <a href="https://www.xia-fei.com">夏飞</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="91px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=xia-fei&repo=xia-fei.github.io&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/hux-blog.min.js"></script>
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://www.xia-fei.com/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+<script>
+    // dynamic User by Hux
+    var _gaId = 'UA-XXXXXXXX-X';
+    var _gaDomain = 'yoursite';
+
+    // Originial
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', _gaId, _gaDomain);
+    ga('send', 'pageview');
+</script>
+
+
+
+
+<!-- Baidu Tongji -->
+
+<script>
+    // dynamic User by Hux
+    var _baId = '13f02310ca9dd9767d91fc9871e30f21';
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+
+
+	<a id="rocket" href="#top" class=""></a>
+	<script type="text/javascript" src="/js/totop.js?v=1.0.0" async=""></script>
+    <script type="text/javascript" src="/js/toc.js?v=1.0.0" async=""></script>
+<!-- Image to hack wechat -->
+<img src="img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
