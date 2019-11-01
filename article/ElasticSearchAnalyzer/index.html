@@ -16,11 +16,11 @@
      <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
     <title>
         
-          Nginx location总结 - 夏飞 | Blog
+          ES分词器笔记 - 夏飞 | Blog
         
     </title>
 
-    <link rel="canonical" href="https://www.xia-fei.com/article/NginxLocation/">
+    <link rel="canonical" href="https://www.xia-fei.com/article/ElasticSearchAnalyzer/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -90,14 +90,14 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#nginx" title="nginx">nginx</a>
+                              <a class="tag" href="/tags/#es" title="es">es</a>
                             
                         </div>
-                        <h1>Nginx location总结</h1>
+                        <h1>ES分词器笔记</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by 夏飞 on
-                            2019-10-08
+                            2019-11-01
                         </span>
                     </div>
                 
@@ -214,33 +214,60 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h3 id="语法规则">语法规则</h3>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">location [ = | ~ | ~* | ^~ ] uri &#123; ... &#125;</span><br></pre></td></tr></table></figure>
-<p>简单来说 匹配它匹配的默认就分两种</p>
-<h5 id="1前缀匹配">1.前缀匹配</h5>
-<p>类似下面这种<br>
-<code>location /user {}</code></p>
-<h5 id="2正则匹配">2.正则匹配</h5>
-<p><code>location ~ /u.*</code><br>
-<code>location ~* /u.*</code></p>
-<h5 id="3精确匹配">3.精确匹配</h5>
-<p><code>location = /user.html</code></p>
-<h3 id="优先级">优先级</h3>
-<p><code>^~</code> 这个优先级最高</p>
-<p>然后按照<br>
-<code>正则&gt;前缀匹配</code></p>
-<p>要想前缀匹配 大于正则 使用 <code>^~</code></p>
-<h3 id="pass_proxy-末尾加-作用">pass_proxy 末尾加<code>/</code> 作用</h3>
-<p><code>pass_proxy http:192.168.0.55:3000</code><br>
-<code>pass_proxy http:192.168.0.55:3000/</code></p>
-<p>加<code>/</code>的作用就是 会去掉前缀匹配的部分,然后去反向代理后端服务器</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">location /a/ &#123;</span><br><span class="line">	pass_proxy http:192.168.0.55:3000/</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="alias">alias</h3>
-<p>相当于丢弃 location 部分URL</p>
-<p>例如:<br>
-用户请求 <code>/a/ccc</code><br>
-加<code>/</code> 实际到后端服务请求是 <code>/ccc</code><br>
-不加<code>/</code> 实际请求是<code>/a/ccc</code></p>
+                <p>#ES分词器</p>
+<p>##关键组件组成</p>
+<h3 id="char-filter-字符过滤器">char filter  字符过滤器</h3>
+<p>对文本进行字符过滤处理，如处理文本中的html标签字符。处理完后再交给tokenizer进行分词。一个analyzer中可包含0个或多个字符过滤器，多个按配置顺序依次进行处理。<br>
+例如 去掉html标记</p>
+<h3 id="tokenizer-分词器">tokenizer 分词器</h3>
+<p>对文本进行分词 例如 按单词的空格<br>
+一个analyzer必需且只可包含一个tokenizer</p>
+<h3 id="token-filter-词项过滤器">token filter  词项过滤器</h3>
+<p>对分过的词进行过滤处理 如转小写、同义词处理,停用词。</p>
+<blockquote>
+<p>停用词 就是用来过滤掉无用的词 比如英文的 <code>the</code> <code>a</code></p>
+</blockquote>
+<h2 id="索引分词器设置">索引分词器设置</h2>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">PUT /my_index</span><br><span class="line">&#123;</span><br><span class="line">    &quot;settings&quot;: &#123;</span><br><span class="line">        &quot;analysis&quot;: &#123;</span><br><span class="line">            &quot;char_filter&quot;: &#123; ... custom character filters ... &#125;,</span><br><span class="line">            &quot;tokenizer&quot;:   &#123; ...    custom tokenizers     ... &#125;,</span><br><span class="line">            &quot;filter&quot;:      &#123; ...   custom token filters   ... &#125;,</span><br><span class="line">            &quot;analyzer&quot;:    &#123; ...    custom analyzers      ... &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">PUT /my_index</span><br><span class="line">&#123;</span><br><span class="line">    &quot;settings&quot;: &#123;</span><br><span class="line">        &quot;analysis&quot;: &#123;</span><br><span class="line">            &quot;char_filter&quot;: &#123;</span><br><span class="line">                &quot;&amp;_to_and&quot;: &#123;</span><br><span class="line">                    &quot;type&quot;:       &quot;mapping&quot;,</span><br><span class="line">                    &quot;mappings&quot;: [ &quot;&amp;=&gt; and &quot;]</span><br><span class="line">            &#125;&#125;,</span><br><span class="line">            &quot;filter&quot;: &#123;</span><br><span class="line">                &quot;my_stopwords&quot;: &#123;</span><br><span class="line">                    &quot;type&quot;:       &quot;stop&quot;,</span><br><span class="line">                    &quot;stopwords&quot;: [ &quot;the&quot;, &quot;a&quot; ]</span><br><span class="line">            &#125;&#125;,</span><br><span class="line">            &quot;analyzer&quot;: &#123;</span><br><span class="line">                &quot;my_analyzer&quot;: &#123;</span><br><span class="line">                    &quot;type&quot;:         &quot;custom&quot;,</span><br><span class="line">                    &quot;char_filter&quot;:  [ &quot;html_strip&quot;, &quot;&amp;_to_and&quot; ],</span><br><span class="line">                    &quot;tokenizer&quot;:    &quot;standard&quot;,</span><br><span class="line">                    &quot;filter&quot;:       [ &quot;lowercase&quot;, &quot;my_stopwords&quot; ]</span><br><span class="line">            &#125;&#125;</span><br><span class="line">&#125;&#125;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="内置组件">内置组件</h2>
+<h3 id="char-filter">char filter</h3>
+<p>html_strip ：过滤html标签，解码HTML entities like &amp;.<br>
+mapping ：用指定的字符串替换文本中的某字符串。<br>
+pattern_replace ：进行正则表达式替换。</p>
+<h3 id="tokenizer">Tokenizer</h3>
+<ul>
+<li>Letter Tokenizer</li>
+<li>Lowercase Tokenizer</li>
+<li>Whitespace Tokenizer</li>
+<li>UAX URL Email Tokenizer</li>
+<li>Classic Tokenizer</li>
+<li>Thai Tokenizer</li>
+<li>NGram Tokenizer</li>
+<li>Edge NGram Tokenizer</li>
+<li>Keyword Tokenizer</li>
+<li>Pattern Tokenizer</li>
+<li>Simple Pattern Tokenizer</li>
+<li>Simple Pattern Split Tokenizer</li>
+<li>Path Hierarchy Tokenizer</li>
+</ul>
+<h3 id="token-filter">Token Filter</h3>
+<p>Lowercase Token Filter ：lowercase 转小写<br>
+Stop Token Filter ：stop 停用词过滤器<br>
+Synonym Token Filter： synonym 同义词过滤器</p>
+<h3 id="analyzer">Analyzer</h3>
+<ul>
+<li>Standard Analyzer</li>
+<li>Simple Analyzer</li>
+<li>Whitespace Analyzer</li>
+<li>Stop Analyzer</li>
+<li>Keyword Analyzer</li>
+<li>Pattern Analyzer</li>
+<li>Language Analyzers</li>
+<li>Fingerprint Analyzer</li>
+</ul>
+<h3 id="参考文档">参考文档</h3>
+<p><a href="https://www.cnblogs.com/leeSmall/p/9195782.html" target="_blank" rel="noopener">https://www.cnblogs.com/leeSmall/p/9195782.html</a></p>
 
                 
 
@@ -248,13 +275,9 @@
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/article/ElasticSearchAnalyzer/" data-toggle="tooltip" data-placement="top" title="ES分词器笔记">&larr; Previous Post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/article/spring-mvc-vue/" data-toggle="tooltip" data-placement="top" title="SpringMVC 配置html5 history模式">Next Post &rarr;</a>
+                            <a href="/article/NginxLocation/" data-toggle="tooltip" data-placement="top" title="Nginx location总结">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -319,7 +342,7 @@
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#语法规则"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">&#x8BED;&#x6CD5;&#x89C4;&#x5219;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#1前缀匹配"><span class="toc-nav-number">1.0.1.</span> <span class="toc-nav-text">1.&#x524D;&#x7F00;&#x5339;&#x914D;</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#2正则匹配"><span class="toc-nav-number">1.0.2.</span> <span class="toc-nav-text">2.&#x6B63;&#x5219;&#x5339;&#x914D;</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#3精确匹配"><span class="toc-nav-number">1.0.3.</span> <span class="toc-nav-text">3.&#x7CBE;&#x786E;&#x5339;&#x914D;</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#优先级"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">&#x4F18;&#x5148;&#x7EA7;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#pass_proxy-末尾加-作用"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">pass_proxy &#x672B;&#x5C3E;&#x52A0;<code>/</code> &#x4F5C;&#x7528;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#alias"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">alias</span></a></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#char-filter-字符过滤器"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">char filter  &#x5B57;&#x7B26;&#x8FC7;&#x6EE4;&#x5668;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#tokenizer-分词器"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">tokenizer &#x5206;&#x8BCD;&#x5668;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#token-filter-词项过滤器"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">token filter  &#x8BCD;&#x9879;&#x8FC7;&#x6EE4;&#x5668;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#索引分词器设置"><span class="toc-nav-number"></span> <span class="toc-nav-text">&#x7D22;&#x5F15;&#x5206;&#x8BCD;&#x5668;&#x8BBE;&#x7F6E;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#内置组件"><span class="toc-nav-number"></span> <span class="toc-nav-text">&#x5185;&#x7F6E;&#x7EC4;&#x4EF6;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#char-filter"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">char filter</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#tokenizer"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">Tokenizer</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#token-filter"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">Token Filter</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#analyzer"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">Analyzer</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#参考文档"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">&#x53C2;&#x8003;&#x6587;&#x6863;</span></a></li></ol>
         
         </div>
       </aside>
@@ -339,7 +362,7 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#nginx" title="nginx">nginx</a>
+                          <a class="tag" href="/tags/#es" title="es">es</a>
                         
                     </div>
                 </section>

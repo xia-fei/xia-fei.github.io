@@ -7,24 +7,16 @@
     </url>
 
     <url>
+        <loc>https://www.xia-fei.com/article/ElasticSearchAnalyzer/</loc>
+        <lastmod>2019-11-01T07:05:26.793Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.xia-fei.com/article/NginxLocation/</loc>
         <lastmod>2019-10-08T12:23:15.412Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.xia-fei.com/article/mongodb-deploy/</loc>
-        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.xia-fei.com/article/ko-spring-mvc/</loc>
-        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
@@ -40,6 +32,22 @@
 
     <url>
         <loc>https://www.xia-fei.com/article/introduction/</loc>
+        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.xia-fei.com/article/ko-spring-mvc/</loc>
+        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.xia-fei.com/article/mongodb-deploy/</loc>
         <lastmod>2019-09-19T02:49:21.689Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -71,7 +79,7 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/article/JVM-ClassLoader/</loc>
+        <loc>https://www.xia-fei.com/article/Links/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -79,7 +87,7 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/article/Links/</loc>
+        <loc>https://www.xia-fei.com/article/JVM-ClassLoader/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
