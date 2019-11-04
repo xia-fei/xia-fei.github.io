@@ -16,11 +16,11 @@
      <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
     <title>
         
-          ES分词器笔记 - 夏飞 | Blog
+          技术笔记Notes - 夏飞 | Blog
         
     </title>
 
-    <link rel="canonical" href="https://www.xia-fei.com/article/ElasticSearchAnalyzer/">
+    <link rel="canonical" href="https://www.xia-fei.com/article/Notes/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -90,14 +90,14 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#es" title="es">es</a>
+                              <a class="tag" href="/tags/#mongodb,servlet" title="mongodb,servlet">mongodb,servlet</a>
                             
                         </div>
-                        <h1>ES分词器笔记</h1>
+                        <h1>技术笔记Notes</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by 夏飞 on
-                            2019-11-01
+                            2019-11-04
                         </span>
                     </div>
                 
@@ -214,60 +214,41 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <h1 id="es分词器">ES分词器</h1>
-<h2 id="关键组件组成">关键组件组成</h2>
-<h3 id="char-filter-字符过滤器">char filter  字符过滤器</h3>
-<p>对文本进行字符过滤处理，如处理文本中的html标签字符。处理完后再交给tokenizer进行分词。一个analyzer中可包含0个或多个字符过滤器，多个按配置顺序依次进行处理。<br>
-例如 去掉html标记</p>
-<h3 id="tokenizer-分词器">tokenizer 分词器</h3>
-<p>对文本进行分词 例如 按单词的空格<br>
-一个analyzer必需且只可包含一个tokenizer</p>
-<h3 id="token-filter-词项过滤器">token filter  词项过滤器</h3>
-<p>对分过的词进行过滤处理 如转小写、同义词处理,停用词。</p>
-<blockquote>
-<p>停用词 就是用来过滤掉无用的词 比如英文的 <code>the</code> <code>a</code></p>
-</blockquote>
-<h2 id="索引分词器设置">索引分词器设置</h2>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">PUT /my_index</span><br><span class="line">&#123;</span><br><span class="line">    &quot;settings&quot;: &#123;</span><br><span class="line">        &quot;analysis&quot;: &#123;</span><br><span class="line">            &quot;char_filter&quot;: &#123; ... custom character filters ... &#125;,</span><br><span class="line">            &quot;tokenizer&quot;:   &#123; ...    custom tokenizers     ... &#125;,</span><br><span class="line">            &quot;filter&quot;:      &#123; ...   custom token filters   ... &#125;,</span><br><span class="line">            &quot;analyzer&quot;:    &#123; ...    custom analyzers      ... &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">PUT /my_index</span><br><span class="line">&#123;</span><br><span class="line">    &quot;settings&quot;: &#123;</span><br><span class="line">        &quot;analysis&quot;: &#123;</span><br><span class="line">            &quot;char_filter&quot;: &#123;</span><br><span class="line">                &quot;&amp;_to_and&quot;: &#123;</span><br><span class="line">                    &quot;type&quot;:       &quot;mapping&quot;,</span><br><span class="line">                    &quot;mappings&quot;: [ &quot;&amp;=&gt; and &quot;]</span><br><span class="line">            &#125;&#125;,</span><br><span class="line">            &quot;filter&quot;: &#123;</span><br><span class="line">                &quot;my_stopwords&quot;: &#123;</span><br><span class="line">                    &quot;type&quot;:       &quot;stop&quot;,</span><br><span class="line">                    &quot;stopwords&quot;: [ &quot;the&quot;, &quot;a&quot; ]</span><br><span class="line">            &#125;&#125;,</span><br><span class="line">            &quot;analyzer&quot;: &#123;</span><br><span class="line">                &quot;my_analyzer&quot;: &#123;</span><br><span class="line">                    &quot;type&quot;:         &quot;custom&quot;,</span><br><span class="line">                    &quot;char_filter&quot;:  [ &quot;html_strip&quot;, &quot;&amp;_to_and&quot; ],</span><br><span class="line">                    &quot;tokenizer&quot;:    &quot;standard&quot;,</span><br><span class="line">                    &quot;filter&quot;:       [ &quot;lowercase&quot;, &quot;my_stopwords&quot; ]</span><br><span class="line">            &#125;&#125;</span><br><span class="line">&#125;&#125;&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="内置组件">内置组件</h2>
-<h3 id="char-filter">char filter</h3>
-<p>html_strip ：过滤html标签，解码HTML entities like &amp;.<br>
-mapping ：用指定的字符串替换文本中的某字符串。<br>
-pattern_replace ：进行正则表达式替换。</p>
-<h3 id="tokenizer">Tokenizer</h3>
-<ul>
-<li>Letter Tokenizer</li>
-<li>Lowercase Tokenizer</li>
-<li>Whitespace Tokenizer</li>
-<li>UAX URL Email Tokenizer</li>
-<li>Classic Tokenizer</li>
-<li>Thai Tokenizer</li>
-<li>NGram Tokenizer</li>
-<li>Edge NGram Tokenizer</li>
-<li>Keyword Tokenizer</li>
-<li>Pattern Tokenizer</li>
-<li>Simple Pattern Tokenizer</li>
-<li>Simple Pattern Split Tokenizer</li>
-<li>Path Hierarchy Tokenizer</li>
-</ul>
-<h3 id="token-filter">Token Filter</h3>
-<p>Lowercase Token Filter ：lowercase 转小写<br>
-Stop Token Filter ：stop 停用词过滤器<br>
-Synonym Token Filter： synonym 同义词过滤器</p>
-<h3 id="analyzer">Analyzer</h3>
-<ul>
-<li>Standard Analyzer</li>
-<li>Simple Analyzer</li>
-<li>Whitespace Analyzer</li>
-<li>Stop Analyzer</li>
-<li>Keyword Analyzer</li>
-<li>Pattern Analyzer</li>
-<li>Language Analyzers</li>
-<li>Fingerprint Analyzer</li>
-</ul>
-<h3 id="参考文档">参考文档</h3>
-<p><a href="https://www.cnblogs.com/leeSmall/p/9195782.html" target="_blank" rel="noopener">https://www.cnblogs.com/leeSmall/p/9195782.html</a></p>
+                <h1 id="mongodb实现case-when-和-id-in的查询">MongoDB实现case  when 和 id in的查询</h1>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">db.store.aggregate([&#123;</span><br><span class="line">    $project: &#123;</span><br><span class="line">        <span class="string">"nczStoreId"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="string">"storeName"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="string">"groupIds"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="string">"priority"</span>: &#123;</span><br><span class="line">            $cond: &#123; <span class="attr">if</span>: &#123; <span class="attr">$setIsSubset</span>: [ <span class="string">"$groupIds"</span>,[<span class="number">1000</span>] ]&#125;, <span class="attr">then</span>: <span class="number">1</span>, <span class="attr">else</span>: <span class="number">0</span> &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;])</span><br></pre></td></tr></table></figure>
+<p>放回 当groupIds集合中包含1000 返回auth=true</p>
+<p>$cond 判断表达式文档<br>
+<a href="https://docs.mongodb.com/v3.2/meta/aggregation-quick-reference/#expressions" target="_blank" rel="noopener">https://docs.mongodb.com/v3.2/meta/aggregation-quick-reference/#expressions</a></p>
+<h2 id="它有下面几种表达式判断">它有下面几种表达式判断</h2>
+<h4 id="boolean-expressions">Boolean Expressions</h4>
+<p>$and $or 用于表达式嵌套<br>
+result: { $and: [ { $gt: [ “$qty”, 100 ] }, { $lt: [ “$qty”, 250 ] } ] }</p>
+<h4 id="set-expressions">Set Expressions</h4>
+<p>判断集合是否包含		$setIsSubset</p>
+<h4 id="comparisonexpressions">ComparisonExpressions</h4>
+<p>$eq $gt</p>
+<h4 id="arithmetic-expressions">Arithmetic Expressions</h4>
+<p>用来做计算$abs $floor</p>
+<h4 id="string-expressions">String Expressions</h4>
+<p>字符串运算<br>
+$concat $substr</p>
+<h4 id="text-search-expressions">Text Search expressions</h4>
+<p>$meta</p>
+<h4 id="array-expressions">Array Expressions</h4>
+<p>$size</p>
+<h4 id="date-expressions">Date Expressions</h4>
+<p>等等</p>
+<h3 id="javaapi实现">JavaAPI实现</h3>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">BasicDBObject bson = <span class="keyword">new</span> BasicDBObject();</span><br><span class="line">    bson.put(<span class="string">"$eval"</span>,<span class="string">"db.store.aggregate([&#123;\n"</span> +</span><br><span class="line">            <span class="string">"    $project: &#123;\n"</span> +</span><br><span class="line">            <span class="string">"        \"nczStoreId\": 1,\n"</span> +</span><br><span class="line">            <span class="string">"        \"storeName\": 1,\n"</span> +</span><br><span class="line">            <span class="string">"        \"groupIds\": 1,\n"</span> +</span><br><span class="line">            <span class="string">"        \"auth\": &#123;\n"</span> +</span><br><span class="line">            <span class="string">"            $cond: &#123; if: &#123; $setIsSubset: [ \"$groupIds\",[1000] ]&#125;, then: true, else: false &#125;\n"</span> +</span><br><span class="line">            <span class="string">"        &#125;\n"</span> +</span><br><span class="line">            <span class="string">"    &#125;\n"</span> +</span><br><span class="line">            <span class="string">"&#125;])"</span>);</span><br><span class="line">    Object o=mongoTemplate.getDb().runCommand(bson);</span><br><span class="line">    System.out.println(o.toString());</span><br></pre></td></tr></table></figure>
+<h1 id="servlet笔记">Servlet笔记</h1>
+<h3 id="httpservletrequest">HttpServletRequest</h3>
+<p>GET <a href="http://localhost:8080/test?a=1" target="_blank" rel="noopener">http://localhost:8080/test?a=1</a></p>
+<h3 id="requestgetrequesturl">request.getRequestURL();</h3>
+<p><a href="http://localhost:8080/test" target="_blank" rel="noopener">http://localhost:8080/test</a></p>
+<h3 id="requestgetrequesturi">request.getRequestURI();</h3>
+<p>/test</p>
+<h3 id="requestgetquerystring">request.getQueryString();</h3>
+<p>a=1</p>
 
                 
 
@@ -275,13 +256,9 @@ Synonym Token Filter： synonym 同义词过滤器</p>
                 <!-- Pager -->
                 <ul class="pager">
                     
-                        <li class="previous">
-                            <a href="/article/Notes/" data-toggle="tooltip" data-placement="top" title="技术笔记Notes">&larr; Previous Post</a>
-                        </li>
-                    
                     
                         <li class="next">
-                            <a href="/article/NginxLocation/" data-toggle="tooltip" data-placement="top" title="Nginx location总结">Next Post &rarr;</a>
+                            <a href="/article/ElasticSearchAnalyzer/" data-toggle="tooltip" data-placement="top" title="ES分词器笔记">Next Post &rarr;</a>
                         </li>
                     
                 </ul>
@@ -346,7 +323,7 @@ Synonym Token Filter： synonym 同义词过滤器</p>
         <div id="toc" class="toc-article">
         <strong class="toc-title">Contents</strong>
         
-          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#es分词器"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">ES&#x5206;&#x8BCD;&#x5668;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#关键组件组成"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x5173;&#x952E;&#x7EC4;&#x4EF6;&#x7EC4;&#x6210;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#char-filter-字符过滤器"><span class="toc-nav-number">1.1.1.</span> <span class="toc-nav-text">char filter  &#x5B57;&#x7B26;&#x8FC7;&#x6EE4;&#x5668;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#tokenizer-分词器"><span class="toc-nav-number">1.1.2.</span> <span class="toc-nav-text">tokenizer &#x5206;&#x8BCD;&#x5668;</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#token-filter-词项过滤器"><span class="toc-nav-number">1.1.3.</span> <span class="toc-nav-text">token filter  &#x8BCD;&#x9879;&#x8FC7;&#x6EE4;&#x5668;</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#索引分词器设置"><span class="toc-nav-number">1.2.</span> <span class="toc-nav-text">&#x7D22;&#x5F15;&#x5206;&#x8BCD;&#x5668;&#x8BBE;&#x7F6E;</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#内置组件"><span class="toc-nav-number">1.3.</span> <span class="toc-nav-text">&#x5185;&#x7F6E;&#x7EC4;&#x4EF6;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#char-filter"><span class="toc-nav-number">1.3.1.</span> <span class="toc-nav-text">char filter</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#tokenizer"><span class="toc-nav-number">1.3.2.</span> <span class="toc-nav-text">Tokenizer</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#token-filter"><span class="toc-nav-number">1.3.3.</span> <span class="toc-nav-text">Token Filter</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#analyzer"><span class="toc-nav-number">1.3.4.</span> <span class="toc-nav-text">Analyzer</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#参考文档"><span class="toc-nav-number">1.3.5.</span> <span class="toc-nav-text">&#x53C2;&#x8003;&#x6587;&#x6863;</span></a></li></ol></li></ol></li></ol>
+          <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#mongodb实现case-when-和-id-in的查询"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">MongoDB&#x5B9E;&#x73B0;case  when &#x548C; id in&#x7684;&#x67E5;&#x8BE2;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#它有下面几种表达式判断"><span class="toc-nav-number">1.1.</span> <span class="toc-nav-text">&#x5B83;&#x6709;&#x4E0B;&#x9762;&#x51E0;&#x79CD;&#x8868;&#x8FBE;&#x5F0F;&#x5224;&#x65AD;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#boolean-expressions"><span class="toc-nav-number">1.1.0.1.</span> <span class="toc-nav-text">Boolean Expressions</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#set-expressions"><span class="toc-nav-number">1.1.0.2.</span> <span class="toc-nav-text">Set Expressions</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#comparisonexpressions"><span class="toc-nav-number">1.1.0.3.</span> <span class="toc-nav-text">ComparisonExpressions</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#arithmetic-expressions"><span class="toc-nav-number">1.1.0.4.</span> <span class="toc-nav-text">Arithmetic Expressions</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#string-expressions"><span class="toc-nav-number">1.1.0.5.</span> <span class="toc-nav-text">String Expressions</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#text-search-expressions"><span class="toc-nav-number">1.1.0.6.</span> <span class="toc-nav-text">Text Search expressions</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#array-expressions"><span class="toc-nav-number">1.1.0.7.</span> <span class="toc-nav-text">Array Expressions</span></a></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#date-expressions"><span class="toc-nav-number">1.1.0.8.</span> <span class="toc-nav-text">Date Expressions</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#javaapi实现"><span class="toc-nav-number">1.1.1.</span> <span class="toc-nav-text">JavaAPI&#x5B9E;&#x73B0;</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#servlet笔记"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">Servlet&#x7B14;&#x8BB0;</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#httpservletrequest"><span class="toc-nav-number">2.0.1.</span> <span class="toc-nav-text">HttpServletRequest</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#requestgetrequesturl"><span class="toc-nav-number">2.0.2.</span> <span class="toc-nav-text">request.getRequestURL();</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#requestgetrequesturi"><span class="toc-nav-number">2.0.3.</span> <span class="toc-nav-text">request.getRequestURI();</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#requestgetquerystring"><span class="toc-nav-number">2.0.4.</span> <span class="toc-nav-text">request.getQueryString();</span></a></li></ol></li></ol></li></ol>
         
         </div>
       </aside>
@@ -366,7 +343,7 @@ Synonym Token Filter： synonym 同义词过滤器</p>
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#es" title="es">es</a>
+                          <a class="tag" href="/tags/#mongodb,servlet" title="mongodb,servlet">mongodb,servlet</a>
                         
                     </div>
                 </section>
