@@ -9,14 +9,14 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/tags/linux/</loc>
+        <loc>https://www.xia-fei.com/tags/Bookmark/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/tags/Bookmark/</loc>
+        <loc>https://www.xia-fei.com/tags/linux/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -30,14 +30,14 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/tags/mq/</loc>
+        <loc>https://www.xia-fei.com/tags/Spring/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/tags/Spring/</loc>
+        <loc>https://www.xia-fei.com/tags/mq/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -58,13 +58,6 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/tags/spring/</loc>
-        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.xia-fei.com/tags/Liunx/</loc>
         <lastmod>2019-09-19T02:49:21.689Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -73,6 +66,13 @@
 
     <url>
         <loc>https://www.xia-fei.com/tags/mongo/</loc>
+        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.xia-fei.com/tags/spring/</loc>
         <lastmod>2019-09-19T02:49:21.689Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
