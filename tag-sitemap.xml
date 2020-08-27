@@ -16,13 +16,6 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/tags/linux/</loc>
-        <lastmod>2019-09-19T02:49:21.688Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.xia-fei.com/tags/maven/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -30,7 +23,7 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/tags/Spring/</loc>
+        <loc>https://www.xia-fei.com/tags/linux/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -44,13 +37,6 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/tags/Thread/</loc>
-        <lastmod>2019-09-19T02:49:21.688Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://www.xia-fei.com/tags/bug/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -58,7 +44,28 @@
     </url>
 
     <url>
+        <loc>https://www.xia-fei.com/tags/Spring/</loc>
+        <lastmod>2019-09-19T02:49:21.688Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.xia-fei.com/tags/Thread/</loc>
+        <lastmod>2019-09-19T02:49:21.688Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
         <loc>https://www.xia-fei.com/tags/Liunx/</loc>
+        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://www.xia-fei.com/tags/Mybatis/</loc>
         <lastmod>2019-09-19T02:49:21.689Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -73,13 +80,6 @@
 
     <url>
         <loc>https://www.xia-fei.com/tags/spring/</loc>
-        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
-        <loc>https://www.xia-fei.com/tags/Mybatis/</loc>
         <lastmod>2019-09-19T02:49:21.689Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
@@ -108,7 +108,7 @@
 
     <url>
         <loc>https://www.xia-fei.com/tags/mongodb-servlet/</loc>
-        <lastmod>2019-11-04T01:55:53.390Z</lastmod>
+        <lastmod>2020-08-27T10:02:48.147Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
