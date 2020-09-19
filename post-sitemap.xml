@@ -7,6 +7,14 @@
     </url>
 
     <url>
+        <loc>https://www.xia-fei.com/article/ElasticSearchQueryStruct/</loc>
+        <lastmod>2020-09-19T11:58:09.618Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.xia-fei.com/article/Notes/</loc>
         <lastmod>2020-08-27T10:02:48.147Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -31,31 +39,7 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/article/Yum-package/</loc>
-        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.xia-fei.com/article/introduction/</loc>
-        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.xia-fei.com/article/mybatis-log-sql/</loc>
-        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.xia-fei.com/article/mongodb-deploy/</loc>
         <lastmod>2019-09-19T02:49:21.689Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -71,7 +55,23 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/article/spring-mvc-vue/</loc>
+        <loc>https://www.xia-fei.com/article/mongodb-deploy/</loc>
+        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.xia-fei.com/article/Yum-package/</loc>
+        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.xia-fei.com/article/mybatis-log-sql/</loc>
         <lastmod>2019-09-19T02:49:21.689Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -87,7 +87,15 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/article/JVM-ClassLoader/</loc>
+        <loc>https://www.xia-fei.com/article/spring-mvc-vue/</loc>
+        <lastmod>2019-09-19T02:49:21.689Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.xia-fei.com/article/LinuxPermission/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -103,6 +111,14 @@
     </url>
 
     <url>
+        <loc>https://www.xia-fei.com/article/JVM-ClassLoader/</loc>
+        <lastmod>2019-09-19T02:49:21.688Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://www.xia-fei.com/article/Maven-Repository/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -111,23 +127,7 @@
     </url>
 
     <url>
-        <loc>https://www.xia-fei.com/article/LinuxPermission/</loc>
-        <lastmod>2019-09-19T02:49:21.688Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
         <loc>https://www.xia-fei.com/article/RocketMQ-Deploy/</loc>
-        <lastmod>2019-09-19T02:49:21.688Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://www.xia-fei.com/article/TransactionalConcurrentIssue/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -144,6 +144,14 @@
 
     <url>
         <loc>https://www.xia-fei.com/article/ThreadPoolExecuter/</loc>
+        <lastmod>2019-09-19T02:49:21.688Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://www.xia-fei.com/article/TransactionalConcurrentIssue/</loc>
         <lastmod>2019-09-19T02:49:21.688Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>

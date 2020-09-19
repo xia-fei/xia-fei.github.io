@@ -16,11 +16,11 @@
      <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
     <title>
         
-          About - 夏飞 | Blog
+          ElasticSearch查询结构 - 夏飞 | Blog
         
     </title>
 
-    <link rel="canonical" href="https://www.xia-fei.com/about/">
+    <link rel="canonical" href="https://www.xia-fei.com/article/ElasticSearchQueryStruct/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -73,8 +73,8 @@
 <style type="text/css">
     header.intro-header{
         
-            background-image: url('/img/header_img/about.jpg')
-            /*page*/
+            background-image: url('https://xiafei-web.oss-cn-hangzhou.aliyuncs.com/file-server/1550217547280.png')
+            /*post*/
         
     }
     
@@ -87,10 +87,18 @@
             <div class="row">
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 
-                    <div class="site-heading">
-                        <h1>About</h1>
-                        <!--<hr class="small">-->
-                        <span class="subheading">走在成为极客的路上</span>
+                    <div class="post-heading">
+                        <div class="tags">
+                            
+                              <a class="tag" href="/tags/#elasticsearch" title="elasticsearch">elasticsearch</a>
+                            
+                        </div>
+                        <h1>ElasticSearch查询结构</h1>
+                        <h2 class="subheading">ES查询语法结构体系</h2>
+                        <span class="meta">
+                            Posted by 夏飞 on
+                            2020-09-19
+                        </span>
                     </div>
                 
 
@@ -193,246 +201,225 @@
 
 
     <!-- Main Content -->
-    <!-- Main Content -->
-<div class="container">
-    <div class="row">
-        
+    <!-- Modify by Yu-Hsuan Yen -->
 
-<!-- USE SIDEBAR -->
-    <!-- Post Container -->
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Post Container -->
             <div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                post-container
-            ">
-            
-                <h3 id="一句话">一句话</h3>
-<blockquote>
-<p>Just do it !    (翻译：我只是个搞 IT的！哭笑脸)</p>
-</blockquote>
-<h3 id="关于我">关于我</h3>
-<blockquote>
-<p>一个莫名其妙的，喜欢敲代码，喜欢研究技术的，表面上高冷、不苟言笑的，</p>
-<p>偶尔又嬉皮笑脸，偶尔又特立独行的，双重性格的技术爱好者！</p>
-</blockquote>
-<h3 id="兴趣方向">兴趣方向</h3>
-<blockquote>
-<p>Spring Cloud,Spring Boot相关生态技术研究。<br>
-http协议的思想<br>
-TCP网络通讯</p>
-</blockquote>
-<h3 id="小工具网站分享">小工具网站分享</h3>
-<blockquote>
-<p>图床: <a href="https://image.xia-fei.com" target="_blank" rel="noopener">https://image.xia-fei.com</a></p>
-<p>mysql日志转sql: <a href="https://sql.xia-fei.com" target="_blank" rel="noopener">https://sql.xia-fei.com</a></p>
-<p>sql建表语句转java对象: <a href="https://sql.xia-fei.com" target="_blank" rel="noopener">https://sql.xia-fei.com</a></p>
-<p>网络记事本: <a href="https://note.xia-fei.com" target="_blank" rel="noopener">https://note.xia-fei.com</a>  (<a href="https://note.xia-fei.com/%E5%8F%AF%E9%9A%8F%E6%84%8F%E8%BE%93%E5%85%A5" target="_blank" rel="noopener">https://note.xia-fei.com/可随意输入</a>)</p>
-</blockquote>
-<h3 id="联系我">联系我</h3>
-<blockquote>
-<p>Email: <a href="mailto:xiafei.dev@gmail.com" target="_blank" rel="noopener">xiafei.dev@gmail.com</a></p>
-</blockquote>
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
 
+                <p>query结构</p>
+<ul>
+<li>query
+<ul>
+<li>全文检索相关</li>
+<li>条件过滤相关</li>
+<li>组合上面两个 bool query
+<ul>
+<li>must (and)</li>
+<li>must_not (not)</li>
+<li>should   (or)</li>
+<li>filter  (条件过滤与term类似,性更高)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>aggregations 聚合</li>
+<li>post_filter 结果过滤,聚合不过滤</li>
+</ul>
+<ul>
+<li>全文检索
+<ul>
+<li>match  (全文检索,会对输入结果分词 相当于分词or)</li>
+<li>match_phrase (短语查询,会对内容整个去匹配,相当于全部and)</li>
+<li>query_string (查询语法)</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>条件判断查询  <a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.9/term-level-queries.html#term-level-query-types" target="_blank" rel="noopener">文档</a>
+<ul>
+<li>Exists</li>
+<li>Fuzzy</li>
+<li>IDs</li>
+<li>Prefix</li>
+<li>Range</li>
+<li>Regexp</li>
+<li>Term</li>
+<li>Terms</li>
+<li>Terms set</li>
+<li>Type Query</li>
+<li>Wildcard</li>
+</ul>
+</li>
+</ul>
+
+                
+
+                <hr>
+                <!-- Pager -->
+                <ul class="pager">
+                    
+                    
+                        <li class="next">
+                            <a href="/article/Notes/" data-toggle="tooltip" data-placement="top" title="技术笔记Notes">Next Post &rarr;</a>
+                        </li>
+                    
+                </ul>
 
                 <br>
 
+                <!--打赏-->
+                
+                <!--打赏-->
+
+                <br>
+                <!--分享-->
+                
+                <!--分享-->
+
+                  <!--valine评论-->
+
+
+                                         <div id="vcomments"></div>
+                                            <script>
+                                                new Valine({
+                                                    el: '#vcomments',
+                                                    appId: 'E0ryUYtTAj4TVeeCwvJIJXyE-gzGzoHsz',
+                                                    appKey: 'QFqJhS107cFS5lCgA2oc88F4'
+                                                })
+                                            </script>
+
+                   <!--valine评论-->
+                <br>                       
+                
                 <!-- require APlayer -->
                 
-                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10/dist/APlayer.min.css">
-                    <script src="https://cdn.jsdelivr.net/npm/aplayer@1.10/dist/APlayer.min.js"></script>
-                    <script src="https://cdn.jsdelivr.net/npm/meting@1.2/dist/Meting.min.js"></script>
+
+                <!-- duoshuo Share start -->
                 
-                    <div class="aplayer"
-                        data-id="2423410161"
-                        data-server="netease"
-                        data-type="playlist"
-                        data-fixed="false" >
+                <!-- 多说 Share end-->
+
+                <!-- 多说评论框 start -->
+                
+                <!-- 多说评论框 end -->
+
+                <!-- disqus comment start -->
+                
+                <!-- disqus comment end -->
+
+                
+
+            </div>
+            
+            <!-- Tabe of Content -->
+            <!-- Table of Contents -->
+
+  
+    <style>
+      span.toc-nav-number{
+        display: none
+      }
+    </style>
+  
+    
+      <aside id="sidebar">
+        <div id="toc" class="toc-article">
+        <strong class="toc-title">Contents</strong>
+        
+          <ol class="nav">none</ol>
+        
+        </div>
+      </aside>
+    
+
+                
+            <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#elasticsearch" title="elasticsearch">elasticsearch</a>
+                        
                     </div>
+                </section>
                 
 
-
-
-                <!-- 如果开启评论功能 -->
+                <!-- Friends Blog -->
                 
-                    <hr>
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
 
                     
-
+                        <li><a href="https://sql.xia-fei.com" target="_blank">sql转化JavaBean</a></li>
                     
-
+                        <li><a href="https://image.xia-fei.com" target="_blank">免费图床</a></li>
                     
-
+                        <li><a href="https://note.xia-fei.com" target="_blank">云记事本</a></li>
                     
-
-                    
-
-                    
-
+                </ul>
                 
             </div>
-
-          <!-- Sidebar Container -->
-<div class="
-    col-lg-3 col-lg-offset-0
-    col-md-3 col-md-offset-0
-    col-sm-12
-    col-xs-12
-    sidebar-container
-">
-    
-        <!-- Featured Tags -->
-
-<section>
-    <!-- no hr -->
-    <h5><a href="/tags/">FEATURED TAGS</a></h5>
-    <div class="tags">
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-            <a href="/tags/#spring" title="spring" rel="2">spring</a>
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
-            
-        
+        </div>
     </div>
-</section>
+</article>
 
-        <hr>
-    
-        <!-- Short About -->
-<section class="visible-md visible-lg">
-    <h5><a href="/about/">ABOUT ME</a></h5>
-    <div class="short-about">
 
-        
-            <img id = "avatar_pic" src="/img/psu.jpg" />
-        
 
-        
-            <p>给时光已生命，给岁月已文明</p>
-        
 
-        <!-- SNS Link -->
-        <ul class="list-inline">
-            
-            
-            
 
-            
 
-            
 
-            
-                <li>
-                    <a target="_blank"  href="https://github.com/xia-fei">
-                        <span class="fa-stack fa-lg">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </a>
-                </li>
-            
-            
-            
-            
-        </ul>
-    </div>
-</section>
 
-        <hr>
-    
-        
-  <h5>RECENT POSTS</h3>
-  <div class="widget">
-    <ul>
-      
-        <li>
-          <a href="/article/ElasticSearchQueryStruct/">ElasticSearch查询结构</a>
-        </li>
-      
-        <li>
-          <a href="/article/Notes/">技术笔记Notes</a>
-        </li>
-      
-        <li>
-          <a href="/article/ElasticSearchAnalyzer/">ES分词器笔记</a>
-        </li>
-      
-        <li>
-          <a href="/article/NginxLocation/">Nginx location总结</a>
-        </li>
-      
-        <li>
-          <a href="/article/spring-mvc-vue/">SpringMVC 配置html5 history模式</a>
-        </li>
-      
-    </ul>
-  </div>
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'hover',
+          placement: 'left',
+          icon: 'ℬ'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
 
-        <hr>
-    
-        <!-- Friends Blog -->
-
-<h5>FRIENDS</h5>
-<ul class="list-inline">
-
-    
-        <li><a href="https://sql.xia-fei.com" target="_blank">sql转化JavaBean</a></li>
-    
-        <li><a href="https://image.xia-fei.com" target="_blank">免费图床</a></li>
-    
-        <li><a href="https://note.xia-fei.com" target="_blank">云记事本</a></li>
-    
-</ul>
-
-        <hr>
-    
-        
-    <h5>ARCHIVES</h5>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">4</span></li></ul>
-    </div>
-
-        <hr>
-    
-</div>
-
-        
-    </div>
-</div>
 
 
     <!-- Footer -->

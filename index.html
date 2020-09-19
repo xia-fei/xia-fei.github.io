@@ -213,6 +213,57 @@
 
 <div class="post-preview">
 
+    <a href="/article/ElasticSearchQueryStruct/">
+        <h2 class="post-title">
+            ElasticSearch查询结构
+        </h2>
+        <h3 class="post-subtitle">
+            ES查询语法结构体系
+        </h3>
+        <div class="post-content-preview">
+            query结构
+
+query
+
+全文检索相关
+条件过滤相关
+组合上面两个 bool query
+
+must (and)
+must_not (not)
+should   (or)
+filter  (条件过滤与term类似,性更高)
+
+
+
+
+aggregations 聚合
+post_filter 结果过滤,聚合不过滤
+
+
+全文检索
+
+match  (全文检索,会对输入结果分词 相当于分词or)
+......
+        </div>
+    </a>
+    
+        <p class="post-meta" style="margin: 10px 0;">
+            Posted by 夏飞 on
+            2020-09-19
+        </p>
+        <div class="tags">
+            
+              <a href="/tags/#elasticsearch" title="elasticsearch">elasticsearch</a>
+            
+        </div>
+    
+
+</div>
+<hr>
+
+<div class="post-preview">
+
     <a href="/article/Notes/">
         <h2 class="post-title">
             技术笔记Notes
@@ -534,41 +585,6 @@ https://docs.mongodb.co......
 </div>
 <hr>
 
-<div class="post-preview">
-
-    <a href="/article/JVM-ClassLoader/">
-        <h2 class="post-title">
-            JVM类加载器使用
-        </h2>
-        <h3 class="post-subtitle">
-            
-        </h3>
-        <div class="post-content-preview">
-            
-Java类加载器算是一个老生常谈的问题
-
-什么是类加载器？
-这就是类加载器
-把class文件的byte[] 加载成Class对象，加载到JVM里面
-
-12345678910111213class MyClassLoader extends ClassLoader &#123;    @Override    protected Class&lt;?&gt; findClass(String......
-        </div>
-    </a>
-    
-        <p class="post-meta" style="margin: 10px 0;">
-            Posted by 夏飞 on
-            2018-12-14
-        </p>
-        <div class="tags">
-            
-              <a href="/tags/#jvm" title="jvm">jvm</a>
-            
-        </div>
-    
-
-</div>
-<hr>
-
 
 
 <!-- Pager -->
@@ -636,13 +652,15 @@ Java类加载器算是一个老生常谈的问题
             
         
             
-        
-            
-        
-            
-        
-            
             <a href="/tags/#spring" title="spring" rel="2">spring</a>
+            
+        
+            
+        
+            
+        
+            
+        
             
         
             
@@ -700,6 +718,10 @@ Java类加载器算是一个老生常谈的问题
     <ul>
       
         <li>
+          <a href="/article/ElasticSearchQueryStruct/">ElasticSearch查询结构</a>
+        </li>
+      
+        <li>
           <a href="/article/Notes/">技术笔记Notes</a>
         </li>
       
@@ -713,10 +735,6 @@ Java类加载器算是一个老生常谈的问题
       
         <li>
           <a href="/article/spring-mvc-vue/">SpringMVC 配置html5 history模式</a>
-        </li>
-      
-        <li>
-          <a href="/article/LinuxPermission/">Linux目录读写执行权限分析</a>
         </li>
       
     </ul>
@@ -743,7 +761,7 @@ Java类加载器算是一个老生常谈的问题
         
     <h5>ARCHIVES</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">4</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">September 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">October 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">December 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a><span class="archive-list-count">4</span></li></ul>
     </div>
 
         <hr>
